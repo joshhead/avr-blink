@@ -24,7 +24,7 @@ void delay_ms(uint8_t ms) {
 
 int main(void) {
   DDRB = 0xff;
-  PORTB = 0xaa;
+  PORTB = 0xff;
 
   while (1) {
     delay_ms(200);
