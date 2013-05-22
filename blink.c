@@ -3,7 +3,7 @@
 #include <avr/io.h>
 
 // define what pins the LEDs are connected to.
-#define LED PD0
+#define LED PB0
 
 // Some macros that make the code more readable
 #define output_low(port,pin) port &= ~(1<<pin)
@@ -23,16 +23,11 @@ void delay_ms(uint8_t ms) {
 }
 
 int main(void) {
-  // initialize the direction of PORTD #0 to be an output
-  set_output(DDRD, LED);  
+  DDRB = 0xff;
+  PORTB = 0xaa;
 
   while (1) {
-    // turn on the LED for 200ms
-    output_high(PORTD, LED);
-    delay_ms(50);
-    // now turn off the LED for another 200ms
-    output_low(PORTD, LED);
-    delay_ms(50);
-    // now start over
+    delay_ms(200);
+    PORTB ^= 0xff;
   }
 }
