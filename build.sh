@@ -4,3 +4,5 @@ avr-gcc -c -I. -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-en
 avr-gcc -I. -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -Wall -Wstrict-prototypes -DF_CPU=8000000 -Wa,-adhlns=blink.o -mmcu=attiny85 -std=gnu99 blink.o --output blink.elf -Wl,-Map=%.map,--cref
 
 avr-objcopy -O ihex -R .eeprom blink.elf blink.hex
+
+rm *.elf *.lst *.o %.map
