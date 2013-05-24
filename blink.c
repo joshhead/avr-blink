@@ -3,7 +3,9 @@
 #include <avr/io.h>
 
 // define what pins the LEDs are connected to.
-#define LED PB0
+#define RED PB2
+#define GREEN PB1
+#define BLUE PB0
 
 // Some macros that make the code more readable
 #define output_low(port,pin) port &= ~(1<<pin)
@@ -23,11 +25,36 @@ void delay_ms(uint8_t ms) {
 }
 
 int main(void) {
-  DDRB = 0xff;
-  PORTB = 0xff;
+  DDRB = 0xff; // All PORTB pins to output
 
   while (1) {
-    delay_ms(200);
-    PORTB ^= 0xff;
+    // start with all the LEDs off
+    output_low(PORTB, RED);
+    output_low(PORTB, GREEN);
+    output_low(PORTB, BLUE);
+
+    // turn on the red light for 200ms
+    output_high(PORTB, RED);
+    delay_ms(100);
+
+    // turn on red & green -> yellow for 100ms
+    output_high(PORTB, GREEN);
+    delay_ms(100);
+
+    // now turn off red to make just green
+    output_low(PORTB, RED);
+    delay_ms(100);
+
+    // now turn on green & blue to make greenish-blue
+    output_high(PORTB, BLUE);
+    delay_ms(100);
+
+    // turn off green -> blue
+    output_low(PORTB, GREEN);
+    delay_ms(100);
+
+    // turn on red again to make purple
+    output_high(PORTB, RED);
+    delay_ms(100);
   }
 }
