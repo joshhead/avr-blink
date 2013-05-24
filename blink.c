@@ -24,37 +24,62 @@ void delay_ms(uint8_t ms) {
   }
 }
 
+void do_pwm(uint8_t r_duty, uint8_t g_duty, uint8_t b_duty, uint8_t rate) {
+  uint8_t i;
+
+  while (rate != 0) {
+    output_high(PORTB, RED);
+    output_high(PORTB, GREEN);
+    output_high(PORTB, BLUE);
+
+    for (i=0; i < 255; i++) {
+      if (i == r_duty)
+        output_low(PORTB, RED);
+      if (i == g_duty)
+        output_low(PORTB, GREEN);
+      if (i == b_duty)
+        output_low(PORTB, BLUE);
+    }
+    rate--;
+  }
+}
+
 int main(void) {
-  DDRB = 0xff; // All PORTB pins to output
+  uint8_t i;
+
+  // initialize the direction of the B port to be outputs
+  // on the 3 pins that have LEDs connected
+  set_output(DDRB, RED);
+  set_output(DDRB, GREEN);
+  set_output(DDRB, BLUE);
+
+  // slowly turn red on
+  for (i=0; i<255; i++)
+    do_pwm(i, 0, 0, 5);
 
   while (1) {
-    // start with all the LEDs off
-    output_low(PORTB, RED);
-    output_low(PORTB, GREEN);
-    output_low(PORTB, BLUE);
+    // slowly turn green on too
+    for (i=0; i<255; i++)
+      do_pwm(255, i, 0, 15);
 
-    // turn on the red light for 200ms
-    output_high(PORTB, RED);
-    delay_ms(100);
+    // now turn red off
+    for (i=255; i>0; i--)
+      do_pwm(i, 255, 0, 15);
 
-    // turn on red & green -> yellow for 100ms
-    output_high(PORTB, GREEN);
-    delay_ms(100);
+    // slowly turn on blue
+    for (i=0; i<255; i++)
+      do_pwm(0, 255, i, 15);
 
-    // now turn off red to make just green
-    output_low(PORTB, RED);
-    delay_ms(100);
+    // turn off green
+    for (i=255; i>0; i--)
+      do_pwm(0, i, 255, 15);
 
-    // now turn on green & blue to make greenish-blue
-    output_high(PORTB, BLUE);
-    delay_ms(100);
+    // turn on red
+    for (i=0; i<255; i++)
+      do_pwm(i, 0, 255, 15);
 
-    // turn off green -> blue
-    output_low(PORTB, GREEN);
-    delay_ms(100);
-
-    // turn on red again to make purple
-    output_high(PORTB, RED);
-    delay_ms(100);
+    // turn off blue
+    for (i=255; i>0; i--)
+      do_pwm(255, 0, i, 15);
   }
 }
