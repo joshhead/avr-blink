@@ -49,7 +49,7 @@ int main(void) {
     for (i = 0; i < 255; i++) {
 
       for (which = 0; which < 3; which++) {
-        if (i % dividers[which] == 0) {
+        if (i % dividers[which] == 0 && dividers[which] < 80) {
           output_high(PORTB, leds[which]);
         } else {
           output_low(PORTB, leds[which]);
