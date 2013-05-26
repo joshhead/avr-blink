@@ -2,10 +2,8 @@
 // are available on this chip.
 #include <avr/io.h>
 
-// define what pins the LEDs are connected to.
-#define RED PB2
-#define GREEN PB1
-#define BLUE PB0
+#define NUM_LEDS 5
+#define NUM_STATES 40
 
 // Some macros that make the code more readable
 #define output_low(port,pin) port &= ~(1<<pin)
@@ -13,7 +11,7 @@
 #define set_input(portdir,pin) portdir &= ~(1<<pin)
 #define set_output(portdir,pin) portdir |= (1<<pin)
 
-// this is just a program that 'kills time' in a calibrated method
+// this is just a function that 'kills time' in a calibrated method
 void delay_ms(uint8_t ms) {
   uint16_t delay_count = F_CPU / 17500;
   volatile uint16_t i;
@@ -27,43 +25,59 @@ void delay_ms(uint8_t ms) {
 int main(void) {
   uint8_t i;
   uint8_t which;
-  uint8_t leds[3];
-  uint8_t dividers[3];
+  uint8_t array_start;
+  uint8_t divider;
+  uint8_t leds[NUM_LEDS];
+  uint8_t dividers[NUM_STATES];
+  uint16_t counter;
+  uint16_t counter_reset;
 
-  leds[0] = RED;
-  leds[1] = GREEN;
-  leds[2] = BLUE;
+  leds[0] = PB4;
+  leds[1] = PB3;
+  leds[2] = PB2;
+  leds[3] = PB0;
+  leds[4] = PB1;
 
-  dividers[0] = 130;
-  dividers[1] = 140;
-  dividers[2] = 150;
-
-  // initialize the direction of the B port to be outputs
-  // on the 3 pins that have LEDs connected
-  for (which = 0; which < 3; which++) {
-    set_output(DDRB, leds[which]);
+  for (i = 0; i < NUM_STATES; i++) {
+    dividers[i] = 255;
   }
+
+  dividers[0] = 1;
+  dividers[1] = 2;
+  dividers[2] = 4;
+  dividers[3] = 8;
+  dividers[4] = 16;
+  dividers[5] = 32;
+  dividers[6] = 64;
+  dividers[7] = 128;
+
+  // Set PORTB pins to output
+  DDRB = 0xff;
+
+  i = 0;
+  counter = 0;
+  array_start = 0;
+  divider = 1;
+  counter_reset = 300;
 
   while (1) {
 
-    for (i = 0; i < 255; i++) {
-
-      for (which = 0; which < 3; which++) {
-        if (i % dividers[which] == 0 && dividers[which] < 80) {
-          output_high(PORTB, leds[which]);
-        } else {
-          output_low(PORTB, leds[which]);
-        }
+    for (which = 0; which < NUM_LEDS; which++) {
+      divider = dividers[(which + array_start) % NUM_STATES];
+      if (divider < 255 && i % divider == 0) {
+        output_high(PORTB, leds[which]);
+      } else {
+        output_low(PORTB, leds[which]);
       }
-
     }
 
-    for (which = 0; which < 3; which++) {
-      dividers[which]++;
+    i++;
+    counter++;
+    if (counter == counter_reset) {
+      counter = 0;
 
-      if (dividers[which] > 150) {
-        dividers[which] = 0;
-      }
+      array_start = (array_start + 1) % NUM_STATES;
     }
   }
+
 }
