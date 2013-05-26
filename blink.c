@@ -24,28 +24,15 @@ void delay_ms(uint8_t ms) {
   }
 }
 
-void do_pwm(uint8_t r_duty, uint8_t g_duty, uint8_t b_duty, uint8_t rate) {
-  uint8_t i;
-
-  while (rate != 0) {
-    output_high(PORTB, RED);
-    output_high(PORTB, GREEN);
-    output_high(PORTB, BLUE);
-
-    for (i=0; i < 255; i++) {
-      if (i == r_duty)
-        output_low(PORTB, RED);
-      if (i == g_duty)
-        output_low(PORTB, GREEN);
-      if (i == b_duty)
-        output_low(PORTB, BLUE);
-    }
-    rate--;
-  }
-}
-
 int main(void) {
   uint8_t i;
+  uint8_t r_divider;
+  uint8_t g_divider;
+  uint8_t b_divider;
+
+  r_divider = 130;
+  g_divider = 140;
+  b_divider = 150;
 
   // initialize the direction of the B port to be outputs
   // on the 3 pins that have LEDs connected
@@ -53,33 +40,41 @@ int main(void) {
   set_output(DDRB, GREEN);
   set_output(DDRB, BLUE);
 
-  // slowly turn red on
-  for (i=0; i<255; i++)
-    do_pwm(i, 0, 0, 5);
-
   while (1) {
-    // slowly turn green on too
-    for (i=0; i<255; i++)
-      do_pwm(255, i, 0, 15);
 
-    // now turn red off
-    for (i=255; i>0; i--)
-      do_pwm(i, 255, 0, 15);
+    for (i = 0; i < 255; i++) {
 
-    // slowly turn on blue
-    for (i=0; i<255; i++)
-      do_pwm(0, 255, i, 15);
+      if (i % r_divider == 0) {
+        output_high(PORTB, RED);
+      } else {
+        output_low(PORTB, RED);
+      }
 
-    // turn off green
-    for (i=255; i>0; i--)
-      do_pwm(0, i, 255, 15);
+      if (i % g_divider == 0) {
+        output_high(PORTB, GREEN);
+      } else {
+        output_low(PORTB, GREEN);
+      }
 
-    // turn on red
-    for (i=0; i<255; i++)
-      do_pwm(i, 0, 255, 15);
+      if (i % b_divider == 0) {
+        output_high(PORTB, BLUE);
+      } else {
+        output_low(PORTB, BLUE);
+      }
+    }
 
-    // turn off blue
-    for (i=255; i>0; i--)
-      do_pwm(255, 0, i, 15);
+    r_divider++;
+    g_divider++;
+    b_divider++;
+
+    if (r_divider > 150) {
+      r_divider = 0;
+    }
+    if (g_divider > 150) {
+      g_divider = 0;
+    }
+    if (b_divider > 150) {
+      b_divider = 0;
+    }
   }
 }
