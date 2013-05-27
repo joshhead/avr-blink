@@ -32,11 +32,11 @@ int main(void) {
   uint16_t counter;
   uint16_t counter_reset;
 
-  leds[0] = PB4;
-  leds[1] = PB3;
+  leds[0] = PB3;
+  leds[1] = PB4;
   leds[2] = PB2;
-  leds[3] = PB0;
-  leds[4] = PB1;
+  leds[3] = PB1;
+  leds[4] = PB0;
 
   for (i = 0; i < NUM_STATES; i++) {
     dividers[i] = 255;
