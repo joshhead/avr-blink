@@ -11,17 +11,6 @@
 #define set_input(portdir,pin) portdir &= ~(1<<pin)
 #define set_output(portdir,pin) portdir |= (1<<pin)
 
-// this is just a function that 'kills time' in a calibrated method
-void delay_ms(uint8_t ms) {
-  uint16_t delay_count = F_CPU / 17500;
-  volatile uint16_t i;
-
-  while (ms != 0) {
-    for (i=0; i != delay_count; i++);
-    ms--;
-  }
-}
-
 int main(void) {
   uint8_t i;
   uint8_t which;
